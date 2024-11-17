@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const qs = require("qs");
 const axios = require("axios");
-const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const { v4: uuid } = require("uuid");
 const User = require("./schema.js");
