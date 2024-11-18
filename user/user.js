@@ -140,14 +140,14 @@ router.get("/auth/google/callback", async (req, res) => {
         sameSite: "none",
         secure: true,
         path: "/",
-        domain: "task-board-backend-cbnz.onrender.com",
+        // domain: "task-board-backend-cbnz.onrender.com",
       });
     } else {
       res.cookie("user", JSON.stringify(userInfo), {
         sameSite: "none",
         secure: true,
         path: "/",
-        domain: "task-board-backend-cbnz.onrender.com",
+        // domain: "task-board-backend-cbnz.onrender.com",
       });
     }
 
