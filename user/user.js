@@ -137,21 +137,21 @@ router.get("/auth/google/callback", async (req, res) => {
       });
       newUser.save();
       res.cookie("user", JSON.stringify(newUser), {
-        sameSite: "None",
+        sameSite: "none",
         secure: true,
         path: "/",
-        domain: "task-board-ui-zeta.vercel.app",
+        domain: "task-board-backend-cbnz.onrender.com",
       });
     } else {
       res.cookie("user", JSON.stringify(userInfo), {
-        sameSite: "None",
+        sameSite: "none",
         secure: true,
         path: "/",
-        domain: "task-board-ui-zeta.vercel.app",
+        domain: "task-board-backend-cbnz.onrender.com",
       });
     }
 
-    res.redirect(process.env.REDIRECT_URL);
+    res.status(200).redirect(process.env.REDIRECT_URL);
   } catch (error) {
     console.error("Error during Google OAuth:", error.message);
     res.status(500).send("Authentication failed");
