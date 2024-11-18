@@ -140,14 +140,14 @@ router.get("/auth/google/callback", async (req, res) => {
         sameSite: "None",
         secure: true,
         path: "/",
-        domain: "https://task-board-ui-zeta.vercel.app/",
+        domain: "task-board-ui-zeta.vercel.app",
       });
     } else {
       res.cookie("user", JSON.stringify(userInfo), {
         sameSite: "None",
         secure: true,
         path: "/",
-        domain: "https://task-board-ui-zeta.vercel.app/",
+        domain: "task-board-ui-zeta.vercel.app",
       });
     }
 
