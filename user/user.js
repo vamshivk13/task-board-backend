@@ -9,36 +9,44 @@ const User = require("./schema.js");
 
 //get email, password, confirm password
 router.post("/register", async (req, res) => {
-  if (checkIfUserExist(req.body.email)) {
-    res.send(400).send("User already exist");
+  try {
+    if (checkIfUserExist(req.body.email)) {
+      res.send(400).send("User already exist");
+    }
+    const userInfo = {
+      ...req.body,
+    };
+    const userId = uuid();
+    const newUser = new User({
+      ...userInfo,
+      authMethod: "custom",
+      userId: userId,
+    });
+    newUser.save();
+    // res.cookie("user", JSON.stringify(userInfo));
+    res.json(userInfo);
+  } catch (err) {
+    res.status(500).send("Error while registering the user");
   }
-  const userInfo = {
-    ...req.body,
-  };
-  const userId = uuid();
-  const newUser = new User({
-    ...userInfo,
-    authMethod: "custom",
-    userId: userId,
-  });
-  newUser.save();
-  // res.cookie("user", JSON.stringify(userInfo));
-  res.json(userInfo);
 });
 
 //get email, password
 router.post("/login", async (req, res) => {
-  const user = req.body;
-  const userExist = await checkIfUserExist(user.email);
+  try {
+    const user = req.body;
+    const userExist = await checkIfUserExist(user.email);
 
-  if (userExist) {
-    const matchingUser = await authenticateUser(user);
-    if (matchingUser) {
-      console.log("USER", matchingUser);
-      res.json(matchingUser);
-    } else res.status(401).send("User Not Authorised");
-  } else {
-    res.status(404).send("User not found");
+    if (userExist) {
+      const matchingUser = await authenticateUser(user);
+      if (matchingUser) {
+        console.log("USER", matchingUser);
+        res.json(matchingUser);
+      } else res.status(401).send("User Not Authorised");
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    res.status(500).send("Error while logging in");
   }
 });
 
@@ -74,17 +82,21 @@ async function authenticateUser(user) {
 }
 
 router.get("/auth", (req, res) => {
-  const oauthURL = `https://accounts.google.com/o/oauth2/v2/auth?${qs.stringify(
-    {
-      client_id: clientId,
-      redirect_uri: redirectUrl,
-      response_type: "code",
-      scope: "openid email profile",
-      access_type: "offline",
-    }
-  )}`;
-  console.log("URL", oauthURL);
-  res.redirect(oauthURL);
+  try {
+    const oauthURL = `https://accounts.google.com/o/oauth2/v2/auth?${qs.stringify(
+      {
+        client_id: clientId,
+        redirect_uri: redirectUrl,
+        response_type: "code",
+        scope: "openid email profile",
+        access_type: "offline",
+      }
+    )}`;
+    console.log("URL", oauthURL);
+    res.redirect(oauthURL);
+  } catch {
+    res.status(500).send("Error logging in via google");
+  }
 });
 
 router.get("/auth/google/callback", async (req, res) => {
@@ -129,7 +141,7 @@ router.get("/auth/google/callback", async (req, res) => {
       newUser.save();
     }
     // Display user info
-    res.redirect("http://localhost:5173/");
+    res.redirect(process.env.REDIRECT_URL);
   } catch (error) {
     console.error("Error during Google OAuth:", error.message);
     res.status(500).send("Authentication failed");

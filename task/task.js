@@ -8,6 +8,9 @@ router.post("/create/list", async (req, res) => {
     const newTaskList = new TaskList(taskList);
     const savedTaskList = newTaskList.save();
     if (savedTaskList) res.status(201).json(savedTaskList);
+    else {
+      res.status(404).send("Not found");
+    }
   } catch (err) {
     res.status(500).send("Error saving List");
   }
@@ -24,6 +27,8 @@ router.post("/create/task", async (req, res) => {
     );
     if (newTask) {
       res.status(201).json(newTask);
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(err);
@@ -37,6 +42,8 @@ router.post("/lists", async (req, res) => {
     const lists = await TaskList.find({ userId: userId });
     if (lists) {
       res.status(200).json(lists);
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(error);
@@ -54,6 +61,8 @@ router.post("/update", async (req, res) => {
     );
     if (updatedTask) {
       res.status(200).json(updatedTask);
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(err);
@@ -72,6 +81,8 @@ router.post("/update/list", async (req, res) => {
     );
     if (updatedTask) {
       res.status(200).json(updatedTask);
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(err);
@@ -90,6 +101,8 @@ router.post("/update/task", async (req, res) => {
     );
     if (updatedTask) {
       res.status(200).json(updatedTask);
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(err);
@@ -108,6 +121,8 @@ router.post("/delete", async (req, res) => {
     );
     if (updatedTask) {
       res.status(200).send("Delete success");
+    } else {
+      res.status(404).send("Not found");
     }
   } catch (err) {
     console.log(err);

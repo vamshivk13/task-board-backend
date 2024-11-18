@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+const dotenv = require("dotenv").config();
 
 app.use(express.json());
 
@@ -22,13 +23,12 @@ app.get("/", (req, res) => {
 });
 
 //setting server on a port
-app.listen("3000", () => {
+app.listen(process.env.PORT || "3000", () => {
   console.log("APP running on port 3000");
 });
 
 //setting mongodb
-const uri =
-  "mongodb+srv://taskBoardUser:vk123456$@cluster0.nziuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}@cluster0.nziuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose
   .connect(uri)
