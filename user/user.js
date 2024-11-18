@@ -50,11 +50,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
-const secret = "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";
-const redirectUrl = "http://localhost:3000/user/auth/google/callback";
-const clientId =
-  "1095927862364-4lbd0q4ui5j6dcq9pep2au8ho5uv0qb2.apps.googleusercontent.com";
-
+const secret = process.env.SECRET;
+const redirectUrl = process.env.AUTH_REDIRECT_URL + "user/auth/google/callback";
+const clientId = process.env.CLIENTID;
 async function checkIfUserExist(email) {
   try {
     const user = await User.findOne({ email });
