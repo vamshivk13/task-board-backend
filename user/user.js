@@ -57,8 +57,8 @@ async function checkIfUserExist(email) {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      return true;
-    } else return false;
+      return user;
+    } else return null;
   } catch (err) {
     console.error("Error fetching user:", err);
   }
@@ -125,7 +125,7 @@ router.get("/auth/google/callback", async (req, res) => {
       { headers: { Authorization: `Bearer ${access_token}` } }
     );
 
-    const userExist = await checkIfUserExist(userInfo.email);
+    let userExist = await checkIfUserExist(userInfo.email);
     // Set user info in cookies (optional)
     if (!userExist) {
       const newUser = new User({
@@ -135,8 +135,9 @@ router.get("/auth/google/callback", async (req, res) => {
         authMethod: "google",
         userId: uuid(),
       });
-      newUser.save();
-      res.cookie("user", JSON.stringify(newUser), {
+      const user = newUser.save();
+      userExist = user;
+      res.cookie("user", JSON.stringify(user), {
         sameSite: "none",
         secure: true,
         path: "/",
@@ -151,7 +152,11 @@ router.get("/auth/google/callback", async (req, res) => {
       });
     }
 
-    res.status(200).redirect(process.env.REDIRECT_URL);
+    res
+      .status(200)
+      .redirect(
+        `${process.env.REDIRECT_URL + "?user=" + JSON.stringify(userExist)}`
+      );
   } catch (error) {
     console.error("Error during Google OAuth:", error.message);
     res.status(500).send("Authentication failed");
