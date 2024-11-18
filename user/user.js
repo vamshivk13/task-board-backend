@@ -139,13 +139,15 @@ router.get("/auth/google/callback", async (req, res) => {
       res.cookie("user", JSON.stringify(newUser), {
         sameSite: "None",
         secure: true,
-        domain: ".vercel.app",
+        path: "/",
+        domain: "https://task-board-ui-zeta.vercel.app/",
       });
     } else {
-      res.cookie("user", JSON.stringify(userExist), {
+      res.cookie("user", JSON.stringify(userInfo), {
         sameSite: "None",
         secure: true,
-        domain: ".vercel.app",
+        path: "/",
+        domain: "https://task-board-ui-zeta.vercel.app/p",
       });
     }
 
