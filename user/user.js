@@ -136,12 +136,17 @@ router.get("/auth/google/callback", async (req, res) => {
         userId: uuid(),
       });
       newUser.save();
+      res.cookie("user", JSON.stringify(newUser), {
+        sameSite: "None",
+        secure: false,
+      });
+    } else {
+      res.cookie("user", JSON.stringify(userExist), {
+        sameSite: "None",
+        secure: false,
+      });
     }
 
-    res.cookie("user", JSON.stringify(newUser), {
-      sameSite: "None",
-      secure: false,
-    });
     res.redirect(process.env.REDIRECT_URL);
   } catch (error) {
     console.error("Error during Google OAuth:", error.message);
