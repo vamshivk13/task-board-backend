@@ -138,7 +138,8 @@ router.get("/auth/google/callback", async (req, res) => {
       newUser.save();
       res.cookie("user", JSON.stringify(newUser), {
         sameSite: "None",
-        secure: false,
+        secure: true,
+        domain: ".vercel.app",
       });
     } else {
       res.cookie("user", JSON.stringify(userExist), {
