@@ -10,9 +10,10 @@ const User = require("./schema.js");
 //get email, password, confirm password
 router.post("/register", async (req, res) => {
   try {
-    if (checkIfUserExist(req.body.email)) {
-      res.send(400).send("User already exist");
+    if ((await checkIfUserExist(req.body.email)) != null) {
+      return res.status(400).send("User already exist");
     }
+
     const userInfo = {
       ...req.body,
     };
@@ -56,6 +57,7 @@ const clientId = process.env.CLIENTID;
 async function checkIfUserExist(email) {
   try {
     const user = await User.findOne({ email });
+    console.log("USER CHECK", user);
     if (user) {
       return user;
     } else return null;
