@@ -6,12 +6,13 @@ router.post("/create/list", async (req, res) => {
   const taskList = req.body;
   try {
     const newTaskList = new TaskList(taskList);
-    const savedTaskList = newTaskList.save();
+    const savedTaskList = await newTaskList.save();
     if (savedTaskList) res.status(201).json(savedTaskList);
     else {
       res.status(404).send("Not found");
     }
   } catch (err) {
+    console.log("CREATE TASK", err);
     res.status(500).send("Error saving List");
   }
 });
@@ -19,7 +20,6 @@ router.post("/create/list", async (req, res) => {
 router.post("/create/task", async (req, res) => {
   const task = req.body.task;
   const tasksListId = req.body.tasksListId;
-
   try {
     const newTask = await TaskList.updateOne(
       { tasksListId: tasksListId },
@@ -31,7 +31,6 @@ router.post("/create/task", async (req, res) => {
       res.status(404).send("Not found");
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send("Error saving new Task");
   }
 });
@@ -127,6 +126,22 @@ router.post("/delete", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error updating Task");
+  }
+});
+
+router.post("/delete/list", async (req, res) => {
+  const tasksListId = req.body.tasksListId;
+
+  try {
+    const deletedTasks = await TaskList.deleteOne({ tasksListId: tasksListId });
+    if (deletedTasks) {
+      res.status(200).send("List Deletion success");
+    } else {
+      res.status(404).send("Not found");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error deleting Task");
   }
 });
 

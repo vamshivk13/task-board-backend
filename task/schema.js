@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const task = new mongoose.Schema({
   task: { type: String, required: true },
-  id: { type: String, required: true, unique: true },
+  id: { type: String, required: true },
   note: { type: String, required: true },
   isDone: { type: Boolean, required: true },
   createdAt: { type: Date, required: true },
