@@ -6,6 +6,29 @@ const axios = require("axios");
 const mongoose = require("mongoose");
 const { v4: uuid } = require("uuid");
 const User = require("./schema.js");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const jwtSecret = process.env.JWT_SECRET;
+const secret = process.env.SECRET;
+const redirectUrl = process.env.AUTH_REDIRECT_URL + "user/auth/google/callback";
+const clientId = process.env.CLIENTID;
+
+// auth via token
+router.post("/auth/token", async (req, res) => {
+  try {
+    const token = req.body.token;
+    const response = jwt.verify(token, jwtSecret);
+    return res.json(response);
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token has expired" });
+    } else if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 //get email, password, confirm password
 router.post("/register", async (req, res) => {
@@ -18,16 +41,26 @@ router.post("/register", async (req, res) => {
       ...req.body,
     };
     const userId = uuid();
+    const hashedPassword = await bcrypt.hash(userInfo.password, 10);
     const newUser = new User({
       ...userInfo,
+      password: hashedPassword,
       authMethod: "custom",
       userId: userId,
     });
     newUser.save();
-    // res.cookie("user", JSON.stringify(userInfo));
-    res.json(userInfo);
+    const updatedUserInfo = {
+      name: newUser.name,
+      email: newUser.email,
+      userId: userId,
+      authMethod: newUser.authMethod,
+      createdAt: newUser.createdAt,
+    };
+    const jwtToken = jwt.sign({ ...updatedUserInfo }, jwtSecret);
+    return res.json({ token: jwtToken, user: updatedUserInfo });
   } catch (err) {
-    res.status(500).send("Error while registering the user");
+    console.log("REGISTRATION ERROR", err);
+    return res.status(500).send("Error while registering the user");
   }
 });
 
@@ -38,22 +71,27 @@ router.post("/login", async (req, res) => {
     const userExist = await checkIfUserExist(user.email);
 
     if (userExist) {
-      const matchingUser = await authenticateUser(user);
+      const matchingUser = await authenticateUserWithCredentials(user);
       if (matchingUser) {
-        console.log("USER", matchingUser);
-        res.json(matchingUser);
+        const userDetails = {
+          userId: matchingUser.userId,
+          email: matchingUser.email,
+          name: matchingUser.name,
+          authMethod: matchingUser.authMethod,
+          createdAt: matchingUser.createdAt,
+        };
+        const jwtToken = jwt.sign(userDetails, jwtSecret);
+        return res.json({ token: jwtToken, user: userDetails });
       } else res.status(401).send("User Not Authorised");
     } else {
-      res.status(404).send("User not found");
+      return res.status(404).send("User not found");
     }
   } catch (err) {
-    res.status(500).send("Error while logging in");
+    console.log("Login Error", err);
+    return res.status(500).send("Error while logging in");
   }
 });
 
-const secret = process.env.SECRET;
-const redirectUrl = process.env.AUTH_REDIRECT_URL + "user/auth/google/callback";
-const clientId = process.env.CLIENTID;
 async function checkIfUserExist(email) {
   try {
     const user = await User.findOne({ email });
@@ -66,15 +104,16 @@ async function checkIfUserExist(email) {
   }
 }
 
-async function authenticateUser(user) {
+async function authenticateUserWithCredentials(user) {
   const email = user.email;
   const password = user.password;
   const userWithMatchingCredentials = await User.findOne({
     email: email,
-    password: password,
   });
-  console.log("matching user", userWithMatchingCredentials);
-  if (userWithMatchingCredentials) {
+  const isAuthenticatedUser =
+    userWithMatchingCredentials &&
+    bcrypt.compare(password, userWithMatchingCredentials.password);
+  if (isAuthenticatedUser) {
     return userWithMatchingCredentials;
   } else {
     return null;
