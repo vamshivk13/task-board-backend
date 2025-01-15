@@ -178,22 +178,42 @@ router.get("/auth/google/callback", async (req, res) => {
       });
       const user = newUser.save();
       userExist = user;
-      res.cookie("user", JSON.stringify(user), {
-        sameSite: "none",
-        secure: true,
-        path: "/",
-        // domain: "task-board-backend-cbnz.onrender.com",
-      });
+      res.cookie(
+        "google-token",
+        jwt.sign({
+          name: userInfo.name,
+          email: userInfo.email,
+          password: null,
+          authMethod: "google",
+          userId: uuid(),
+        }),
+        {
+          sameSite: "none",
+          secure: true,
+          path: "/",
+          // domain: "task-board-backend-cbnz.onrender.com",
+        }
+      );
     } else {
-      res.cookie("user", JSON.stringify(userInfo), {
-        sameSite: "none",
-        secure: true,
-        path: "/",
-        // domain: "task-board-backend-cbnz.onrender.com",
-      });
+      res.cookie(
+        "google-token",
+        {
+          name: userExist.name,
+          email: userExist.email,
+          password: null,
+          authMethod: "google",
+          userId: userExist.userId,
+        },
+        {
+          sameSite: "none",
+          secure: true,
+          path: "/",
+          // domain: "task-board-backend-cbnz.onrender.com",
+        }
+      );
     }
 
-    res
+    return res
       .status(200)
       .redirect(
         `${process.env.REDIRECT_URL + "?user=" + JSON.stringify(userExist)}`
