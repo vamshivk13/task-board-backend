@@ -17,7 +17,7 @@ const clientId = process.env.CLIENTID;
 // auth via token
 router.post("/auth/token", async (req, res) => {
   try {
-    const token = req.body.token;
+    const token = req.body.token || req.cookies["google-token"];
     const response = jwt.verify(token, jwtSecret);
     return res.json(response);
   } catch (err) {
