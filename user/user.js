@@ -219,11 +219,7 @@ router.get("/auth/google/callback", async (req, res) => {
       );
     }
 
-    return res
-      .status(200)
-      .redirect(
-        `${process.env.REDIRECT_URL + "?user=" + JSON.stringify(userExist)}`
-      );
+    return res.status(200).redirect(`${process.env.REDIRECT_URL}`);
   } catch (error) {
     console.error("Error during Google OAuth:", error.message);
     res.status(500).send("Authentication failed");
