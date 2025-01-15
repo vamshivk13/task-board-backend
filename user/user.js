@@ -180,13 +180,16 @@ router.get("/auth/google/callback", async (req, res) => {
       userExist = user;
       res.cookie(
         "google-token",
-        jwt.sign({
-          name: userInfo.name,
-          email: userInfo.email,
-          password: null,
-          authMethod: "google",
-          userId: uuid(),
-        }),
+        jwt.sign(
+          {
+            name: userInfo.name,
+            email: userInfo.email,
+            password: null,
+            authMethod: "google",
+            userId: uuid(),
+          },
+          jwtSecret
+        ),
         {
           sameSite: "none",
           secure: true,
@@ -197,13 +200,16 @@ router.get("/auth/google/callback", async (req, res) => {
     } else {
       res.cookie(
         "google-token",
-        {
-          name: userExist.name,
-          email: userExist.email,
-          password: null,
-          authMethod: "google",
-          userId: userExist.userId,
-        },
+        jwt.sign(
+          {
+            name: userExist.name,
+            email: userExist.email,
+            password: null,
+            authMethod: "google",
+            userId: userExist.userId,
+          },
+          jwtSecret
+        ),
         {
           sameSite: "none",
           secure: true,
