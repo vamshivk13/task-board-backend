@@ -17,10 +17,12 @@ const clientId = process.env.CLIENTID;
 // auth via token
 router.post("/auth/token", async (req, res) => {
   try {
+    console.log("auth token validation req", req);
     const token = req.body.token || req.cookies["google-token"];
     const response = jwt.verify(token, jwtSecret);
     return res.json(response);
   } catch (err) {
+    console.log("auth token validation error", err);
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token has expired" });
     } else if (err.name === "JsonWebTokenError") {
