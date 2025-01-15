@@ -184,7 +184,7 @@ router.get("/auth/google/callback", async (req, res) => {
           {
             name: userInfo.name,
             email: userInfo.email,
-            password: null,
+            createdAt: Date.now(),
             authMethod: "google",
             userId: uuid(),
           },
@@ -204,7 +204,7 @@ router.get("/auth/google/callback", async (req, res) => {
           {
             name: userExist.name,
             email: userExist.email,
-            password: null,
+            createdAt: userExist.createdAt,
             authMethod: "google",
             userId: userExist.userId,
           },
