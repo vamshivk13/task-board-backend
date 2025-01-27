@@ -50,6 +50,22 @@ router.post("/lists", async (req, res) => {
   }
 });
 
+router.post("/board-list", async (req, res) => {
+  const userId = req.body.userId;
+  const boardId = req.body.boardId;
+  try {
+    const lists = await TaskList.find({ userId: userId, boardId: boardId });
+    if (lists) {
+      res.status(200).json(lists);
+    } else {
+      res.status(404).send("Not found");
+    }
+  } catch (err) {
+    console.log(error);
+    res.status(500).send("Error getting lists");
+  }
+});
+
 router.post("/update", async (req, res) => {
   const task = req.body.task;
   const tasksListId = req.body.tasksListId;

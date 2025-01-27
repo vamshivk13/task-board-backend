@@ -19,9 +19,11 @@ app.use((req, res, next) => {
 });
 const userRoute = require("./user/user.js");
 const taskRoute = require("./task/task.js");
+const boardRoute = require("./board/board.js");
 
 app.use("/user", userRoute);
 app.use("/task", taskRoute);
+app.use("/board", boardRoute);
 
 app.get("/", (req, res) => {
   console.log("get at ", req.path);

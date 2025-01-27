@@ -12,6 +12,7 @@ const taskSchema = new mongoose.Schema({
   taskName: { type: String, required: true },
   tasks: { type: [task], default: [], required: false },
   userId: { type: String, required: true },
+  boardId: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Task", taskSchema);
