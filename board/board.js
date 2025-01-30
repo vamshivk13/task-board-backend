@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Board = require("./boardSchema");
+const Task = require("./../task/schema");
 
 router.get("/", async (req, res) => {
   try {
@@ -27,9 +28,12 @@ router.post("/create", async (req, res) => {
 });
 router.delete("/delete", async (req, res) => {
   try {
-    const boardId = req.query.id;
+    const boardId = req.query.boardId;
+    console.log("BOARDID", boardId);
     const deletedResponse = await Board.deleteOne({ id: boardId });
-    if (deletedResponse.deletedCount == 1) {
+    const deletedTask = await Task.deleteMany({ boardId: boardId });
+    console.log(deletedResponse, deletedTask);
+    if (deletedResponse.deletedCount == 1 && deletedTask.acknowledged) {
       return res.status(200).send("Successfully deleted");
     } else {
       return res.status(404).send("Not Found");
