@@ -6,6 +6,7 @@ const task = new mongoose.Schema({
   note: { type: String, required: true },
   isDone: { type: Boolean, required: true },
   createdAt: { type: Date, required: true },
+  order: { type: Number, required: true },
 });
 const taskSchema = new mongoose.Schema({
   tasksListId: { type: String, required: true, unique: true },
